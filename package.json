@@ -20,14 +20,15 @@
   "author": "tyankatsu <frips.ryilsufupe+dev@gmail.com> (https://tyankatsu.com/)",
   "main": "lib/main.js",
   "scripts": {
-    "build": "tsc --project tsconfig.build.json",
+    "build:tsc": "tsc --project tsconfig.build.json",
+    "build:ncc": "ncc build --minify --source-map --license licenses.txt",
+    "build": "run-s build:tsc build:ncc",
     "format:prettier": "prettier --check '**/*.ts'",
     "format:prettier:fix": "prettier --write '**/*.ts'",
     "format:eslint": "eslint src/**/*.ts",
     "format:eslint:fix": "eslint src/**/*.ts --fix",
     "format": "run-s format:prettier format:eslint",
     "format:fix": "run-s format:prettier:fix format:eslint:fix",
-    "package": "ncc build --minify --source-map --license licenses.txt",
     "test": "npm run build && vitest"
   },
   "dependencies": {
