@@ -20,6 +20,10 @@ const query = `query a {
                     __typename
                     ... on CheckRun{
                       name
+                      checkSuite {
+                        id
+                        status
+                      }
                     }
                   }
                 }
