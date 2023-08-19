@@ -31,7 +31,6 @@ const query = `query a {
     }
   }
 }
-}
 `;
 
 const run = async () => {
