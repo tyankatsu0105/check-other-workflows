@@ -5,16 +5,16 @@ import * as github from "@actions/github";
 import { feature } from "./feature";
 import { getInput, Inputs } from "./input";
 
-const query = `query a {
-  repository(owner: "tyankatsu0105", name: "check-other-workflows"){
-    pullRequest(number: 2){
+const query = `query a($owner: String!, $repo: String!, $pr: Int!) {
+  repository(name: $repo, owner: $owner){
+    pullRequest(number: $pr){
       commits(last: 1){
         edges{
           node{
             commit {
               statusCheckRollup{
                 state
-                contexts(first: 100){
+                contexts(first: 50){
                   totalCount
                   nodes{
                     __typename
@@ -45,9 +45,13 @@ const run = async () => {
     const context = github.context;
     const octokit = github.getOctokit(inputs.token);
 
-    const vars = { ...context.repo, expression: context.sha };
+    const parameters = {
+      owner: context.repo.owner,
+      pr: context.payload.pull_request?.number,
+      repo: context.repo.repo,
+    };
 
-    const res = await octokit.graphql(query, vars);
+    const res = await octokit.graphql(query, parameters);
 
     // const hoge = await exec.exec(
     //   `gh pr checks ${context.payload.pull_request?.number}`
