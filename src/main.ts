@@ -1,6 +1,7 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 
+import { feature } from "./feature";
 import { getInput, Inputs } from "./input";
 
 const run = () => {
@@ -14,6 +15,10 @@ const run = () => {
     core.debug(JSON.stringify(context, null, 2));
 
     // core.setOutput("time", new Date().toTimeString());
+    feature({
+      context,
+      inputs,
+    });
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message);
   }
