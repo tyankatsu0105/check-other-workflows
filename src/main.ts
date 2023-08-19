@@ -5,32 +5,24 @@ import * as github from "@actions/github";
 import { feature } from "./feature";
 import { getInput, Inputs } from "./input";
 
-const query = `query commitRef($owner: String!, $repo: String!, $expression: String!) {
-  repository(name: $repo, owner: $owner) {
-    object(expression: $expression) {
-      __typename
-      ... on Commit {
-        statusCheckRollup {
-          state
-          contexts(first: 100) {
-            totalCount
-            nodes {
-              __typename
-              ... on CheckRun {
-                completedAt
-                conclusion
-                permalink
-                startedAt
-                status
-                summary
-                text
-              }
-              ... on StatusContext {
-                createdAt
-                context
-                description
+const query = `query a {
+  repository(owner: "tyankatsu0105", name: "check-other-workflows"){
+    pullRequest(number: 2){
+      commits(last: 1){
+        edges{
+          node{
+            commit {
+              statusCheckRollup{
                 state
-                targetUrl
+                contexts(first: 100){
+                  totalCount
+                  nodes{
+                    __typename
+                    ... on CheckRun{
+                      name
+                    }
+                  }
+                }
               }
             }
           }
@@ -38,6 +30,7 @@ const query = `query commitRef($owner: String!, $repo: String!, $expression: Str
       }
     }
   }
+}
 }
 `;
 
