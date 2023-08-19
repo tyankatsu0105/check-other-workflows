@@ -1,5 +1,5 @@
 import * as core from "@actions/core";
-import * as exec from "@actions/exec";
+// import * as exec from "@actions/exec";
 import * as github from "@actions/github";
 
 import { feature } from "./feature";
@@ -19,13 +19,13 @@ const run = async () => {
       repo: context.repo.repo,
     });
 
-    const hoge = await exec.exec(
-      `gh pr checks ${context.payload.pull_request?.number}`
-    );
+    // const hoge = await exec.exec(
+    //   `gh pr checks ${context.payload.pull_request?.number}`
+    // );
 
     core.debug(JSON.stringify(inputs, null, 2));
     core.debug(JSON.stringify(data, null, 2));
-    core.debug(`${hoge}`);
+    // core.debug(`${hoge}`);
     // core.debug(JSON.stringify(context, null, 2));
 
     // core.setOutput("time", new Date().toTimeString());
