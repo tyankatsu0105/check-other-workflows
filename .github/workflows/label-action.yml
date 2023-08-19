@@ -1,11 +1,11 @@
-name: Submit action
+name: label action
 
 on:
-  pull_request_review:
-    types: [submitted]
+  pull_request:
+    types: [labeled]
 
 jobs:
-  submit-action:
+  label-action:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
