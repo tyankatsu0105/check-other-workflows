@@ -13,9 +13,9 @@ const run = async () => {
     const context = github.context;
     const octokit = github.getOctokit(inputs.token);
 
-    const { data } = await octokit.rest.pulls.get({
+    const { data } = await octokit.rest.checks.listForRef({
       owner: context.repo.owner,
-      pull_number: context.payload.pull_request?.number ?? 0,
+      ref: context.ref,
       repo: context.repo.repo,
     });
 
