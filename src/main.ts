@@ -24,7 +24,7 @@ const run = async () => {
     );
 
     core.debug(JSON.stringify(inputs, null, 2));
-    core.debug(data.statuses_url);
+    core.debug(JSON.stringify(data, null, 2));
     core.debug(`${hoge}`);
     // core.debug(JSON.stringify(context, null, 2));
 
