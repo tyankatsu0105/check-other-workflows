@@ -29,10 +29,12 @@
     "format:eslint:fix": "eslint src/**/*.ts --fix",
     "format": "run-s format:prettier format:eslint",
     "format:fix": "run-s format:prettier:fix format:eslint:fix",
-    "test": "npm run build && vitest"
+    "test": "npm run build && vitest --run",
+    "test:watch": "npm run build && vitest"
   },
   "dependencies": {
-    "@actions/core": "^1.10.0"
+    "@actions/core": "^1.10.0",
+    "@actions/github": "^5.1.1"
   },
   "devDependencies": {
     "@types/node": "20.5.0",

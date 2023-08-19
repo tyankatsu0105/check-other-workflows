@@ -1,14 +1,13 @@
 import * as core from "@actions/core";
 
-type Input = Readonly<{
+export type Inputs = Readonly<{
   /**
-   * The number of milliseconds to wait.
-   * @example 1000
+   * GitHub Access Token
    */
-  milliseconds: string;
+  token: string;
 }>;
 
-export const getInput = <InputKey extends keyof Input>(
+export const getInput = <InputKey extends keyof Inputs>(
   name: InputKey,
-  options?: Parameters<typeof core.getInput>[1],
-): Input[InputKey] => core.getInput(name, options);
+  options?: Parameters<typeof core.getInput>[1]
+): Inputs[InputKey] => core.getInput(name, options);
