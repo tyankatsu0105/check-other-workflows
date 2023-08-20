@@ -1,0 +1,30 @@
+query GetLatestCommitChecks($owner: String!, $repo: String!, $pr: Int!) {
+  repository(name: $repo, owner: $owner) {
+    pullRequest(number: $pr) {
+      commits(last: 1) {
+        edges {
+          node {
+            commit {
+              statusCheckRollup {
+                state
+                contexts(first: 50) {
+                  totalCount
+                  nodes {
+                    __typename
+                    ... on CheckRun {
+                      name
+                      checkSuite {
+                        id
+                        status
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

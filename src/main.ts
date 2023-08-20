@@ -1,6 +1,7 @@
 import * as core from "@actions/core";
 // import * as exec from "@actions/exec";
 import * as github from "@actions/github";
+import type { GraphQlQueryResponseData } from "@octokit/graphql";
 
 import { feature } from "./feature";
 import { getInput, Inputs } from "./input";
