@@ -8,7 +8,6 @@ query GetLatestCommitChecks($owner: String!, $repo: String!, $pr: Int!) {
               statusCheckRollup {
                 state
                 contexts(first: 100) {
-                  totalCount
                   nodes {
                     __typename
                     ... on CheckRun {
