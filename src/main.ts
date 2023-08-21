@@ -3,7 +3,7 @@ import * as github from "@actions/github";
 
 import { feature } from "./feature";
 import {
-  CheckStatusState,
+  // CheckStatusState,
   GetLatestCommitChecksDocument,
   GetLatestCommitChecksQuery,
   GetLatestCommitChecksQueryVariables,
