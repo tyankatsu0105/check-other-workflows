@@ -3,6 +3,7 @@ import * as github from "@actions/github";
 
 import { feature } from "./feature";
 import {
+  CheckStatusState,
   GetLatestCommitChecksDocument,
   GetLatestCommitChecksQuery,
   GetLatestCommitChecksQueryVariables,
@@ -19,6 +20,8 @@ const run = async () => {
     const context = github.context;
 
     const { client } = octokitGraphQLClient({ token: inputs.token });
+
+    // const is = () =>
     const { repository } = await client.query<
       GetLatestCommitChecksQueryVariables,
       GetLatestCommitChecksQuery
@@ -28,6 +31,13 @@ const run = async () => {
       repo: context.repo.repo,
     });
 
+    // const
+    // repository?.pullRequest?.commits.edges?.map((edge) => {
+    //   edge?.node?.commit.statusCheckRollup?.contexts.nodes?.map(node => {
+    //     if(node?.__typename !== 'CheckRun') return
+    //     node.conclusion
+    //   })
+    // });
     core.debug(JSON.stringify(inputs, null, 2));
     core.debug(JSON.stringify(repository, null, 2));
 
