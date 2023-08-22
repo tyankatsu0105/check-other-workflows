@@ -21,14 +21,14 @@ const getStatusState = async (
     client: ReturnType<typeof octokitGraphQLClient>["client"];
     context: Context;
     delay: number;
-    ignoreWorkflows: string[];
+    selfID: number;
   }>
 ): Promise<StatusState> => {
   const isAllCompleted =
     params.repository?.pullRequest?.commits.edges?.[0]?.node?.commit.statusCheckRollup?.contexts.nodes?.every(
       (node) => {
         if (node?.__typename !== "CheckRun") return true;
-        if (params.ignoreWorkflows.includes(node.name)) return true;
+        if (node.permalink.includes(params.selfID.toString())) return true;
         if (node.conclusion === null) return false;
 
         return node.status === CheckStatusState.Completed;
@@ -57,8 +57,8 @@ const getStatusState = async (
     client: params.client,
     context: params.context,
     delay: params.delay,
-    ignoreWorkflows: params.ignoreWorkflows,
     repository: data.repository,
+    selfID: params.selfID,
   });
 };
 
@@ -69,8 +69,7 @@ const run = async () => {
     };
 
     const context = github.context;
-    const self = context.workflow;
-    const ignoreWorkflows = [self];
+    const self = context.runId;
 
     const { client } = octokitGraphQLClient({ token: inputs.token });
 
@@ -87,8 +86,8 @@ const run = async () => {
       client,
       context,
       delay: 5000,
-      ignoreWorkflows,
       repository,
+      selfID: self,
     });
 
     core.debug(JSON.stringify(inputs, null, 2));

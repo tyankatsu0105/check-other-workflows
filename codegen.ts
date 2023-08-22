@@ -7,6 +7,9 @@ const config: CodegenConfig = {
     "src/graphql/generated.ts": {
       config: {
         documentMode: "string",
+        scalars: {
+          URI: "string",
+        },
         skipTypename: true,
       },
       plugins: ["typescript", "typescript-operations", "typed-document-node"],

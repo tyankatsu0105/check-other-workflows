@@ -37,7 +37,7 @@ export type Scalars = {
   /** An ISO-8601 encoded UTC date string with millisecond precision. */
   PreciseDateTime: { input: any; output: any; }
   /** An RFC 3986, RFC 3987, and RFC 6570 (level 4) compliant URI string. */
-  URI: { input: any; output: any; }
+  URI: { input: string; output: string; }
   /** A valid x509 certificate string */
   X509Certificate: { input: any; output: any; }
 };
@@ -28861,7 +28861,7 @@ export type GetLatestCommitChecksQueryVariables = Exact<{
 }>;
 
 
-export type GetLatestCommitChecksQuery = { repository?: { pullRequest?: { commits: { edges?: Array<{ node?: { commit: { statusCheckRollup?: { state: StatusState, contexts: { nodes?: Array<{ __typename: 'CheckRun', conclusion?: CheckConclusionState | null, status: CheckStatusState, name: string } | { __typename: 'StatusContext' } | null> | null } } | null } } | null } | null> | null } } | null } | null };
+export type GetLatestCommitChecksQuery = { repository?: { pullRequest?: { commits: { edges?: Array<{ node?: { commit: { statusCheckRollup?: { state: StatusState, contexts: { nodes?: Array<{ __typename: 'CheckRun', conclusion?: CheckConclusionState | null, status: CheckStatusState, name: string, permalink: string } | { __typename: 'StatusContext' } | null> | null } } | null } } | null } | null> | null } } | null } | null };
 
 export class TypedDocumentString<TResult, TVariables>
   extends String
@@ -28895,6 +28895,7 @@ export const GetLatestCommitChecksDocument = new TypedDocumentString(`
                       conclusion
                       status
                       name
+                      permalink
                     }
                   }
                 }
