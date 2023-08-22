@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
+import { Context } from "@actions/github/lib/context";
 
 import { feature } from "./feature";
 import {
@@ -14,6 +15,53 @@ import { getInput, Inputs } from "./input";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const getStatusState = async (
+  params: Readonly<{
+    repository: GetLatestCommitChecksQuery["repository"];
+    client: ReturnType<typeof octokitGraphQLClient>["client"];
+    context: Context;
+    delay: number;
+    ignoreWorkflows: string[];
+  }>
+): Promise<StatusState> => {
+  const isAllCompleted =
+    params.repository?.pullRequest?.commits.edges?.[0]?.node?.commit.statusCheckRollup?.contexts.nodes?.every(
+      (node) => {
+        if (node?.__typename !== "CheckRun") return true;
+        if (params.ignoreWorkflows.includes(node.name)) return true;
+        if (node.conclusion === null) return false;
+
+        return node.status === CheckStatusState.Completed;
+      }
+    );
+
+  if (isAllCompleted)
+    return (
+      params.repository?.pullRequest?.commits.edges?.[0]?.node?.commit
+        .statusCheckRollup?.state ?? StatusState.Success
+    );
+
+  const data = await params.client.query<
+    GetLatestCommitChecksQueryVariables,
+    GetLatestCommitChecksQuery
+  >(GetLatestCommitChecksDocument.toString(), {
+    owner: params.context.repo.owner,
+    pr: params.context.payload.pull_request?.number ?? 0,
+    repo: params.context.repo.repo,
+  });
+
+  await wait(params.delay);
+  core.info("Waiting for all checks to complete...");
+
+  return getStatusState({
+    client: params.client,
+    context: params.context,
+    delay: params.delay,
+    ignoreWorkflows: params.ignoreWorkflows,
+    repository: data.repository,
+  });
+};
+
 const run = async () => {
   try {
     const inputs: Inputs = {
@@ -21,49 +69,27 @@ const run = async () => {
     };
 
     const context = github.context;
+    const self = context.workflow;
+    const ignoreWorkflows = [self];
 
     const { client } = octokitGraphQLClient({ token: inputs.token });
 
-    const getStatusState = async () => {
-      let isAllCompleted: boolean | undefined = false;
-      let state: StatusState | null = null;
+    const { repository } = await client.query<
+      GetLatestCommitChecksQueryVariables,
+      GetLatestCommitChecksQuery
+    >(GetLatestCommitChecksDocument.toString(), {
+      owner: context.repo.owner,
+      pr: context.payload.pull_request?.number ?? 0,
+      repo: context.repo.repo,
+    });
 
-      while (!isAllCompleted) {
-        const data = await client.query<
-          GetLatestCommitChecksQueryVariables,
-          GetLatestCommitChecksQuery
-        >(GetLatestCommitChecksDocument.toString(), {
-          owner: context.repo.owner,
-          pr: context.payload.pull_request?.number ?? 0,
-          repo: context.repo.repo,
-        });
-
-        const repository = data.repository;
-
-        isAllCompleted =
-          repository?.pullRequest?.commits.edges?.[0]?.node?.commit.statusCheckRollup?.contexts.nodes?.every(
-            (node) => {
-              if (node?.__typename !== "CheckRun") return true;
-              if (node.conclusion === null) return false;
-
-              return node.status === CheckStatusState.Completed;
-            }
-          );
-
-        if (isAllCompleted) {
-          state =
-            repository?.pullRequest?.commits.edges?.[0]?.node?.commit
-              .statusCheckRollup?.state ?? StatusState.Success;
-        }
-
-        await new Promise((resolve) => setTimeout(resolve, 5000));
-        core.info("Waiting for all checks to complete...");
-      }
-
-      return state!;
-    };
-
-    const state = await getStatusState();
+    const state = await getStatusState({
+      client,
+      context,
+      delay: 5000,
+      ignoreWorkflows,
+      repository,
+    });
 
     core.debug(JSON.stringify(inputs, null, 2));
     core.debug(JSON.stringify(state, null, 2));
