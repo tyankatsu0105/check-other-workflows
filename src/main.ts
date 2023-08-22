@@ -17,15 +17,23 @@ const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const getStatusState = async (
   params: Readonly<{
-    repository: GetLatestCommitChecksQuery["repository"];
+    repository?: GetLatestCommitChecksQuery["repository"];
     client: ReturnType<typeof octokitGraphQLClient>["client"];
     context: Context;
     delay: number;
     selfID: number;
   }>
 ): Promise<StatusState> => {
+  const data = await params.client.query<
+    GetLatestCommitChecksQueryVariables,
+    GetLatestCommitChecksQuery
+  >(GetLatestCommitChecksDocument.toString(), {
+    owner: params.context.repo.owner,
+    pr: params.context.payload.pull_request?.number ?? 0,
+    repo: params.context.repo.repo,
+  });
   const isAllCompleted =
-    params.repository?.pullRequest?.commits.edges?.[0]?.node?.commit.statusCheckRollup?.contexts.nodes?.every(
+    data.repository?.pullRequest?.commits.edges?.[0]?.node?.commit.statusCheckRollup?.contexts.nodes?.every(
       (node) => {
         if (node?.__typename !== "CheckRun") return true;
         if (node.permalink.includes(params.selfID.toString())) return true;
@@ -37,18 +45,9 @@ const getStatusState = async (
 
   if (isAllCompleted)
     return (
-      params.repository?.pullRequest?.commits.edges?.[0]?.node?.commit
+      data.repository?.pullRequest?.commits.edges?.[0]?.node?.commit
         .statusCheckRollup?.state ?? StatusState.Success
     );
-
-  const data = await params.client.query<
-    GetLatestCommitChecksQueryVariables,
-    GetLatestCommitChecksQuery
-  >(GetLatestCommitChecksDocument.toString(), {
-    owner: params.context.repo.owner,
-    pr: params.context.payload.pull_request?.number ?? 0,
-    repo: params.context.repo.repo,
-  });
 
   await wait(params.delay);
   core.info("Waiting for all checks to complete...");
@@ -57,7 +56,6 @@ const getStatusState = async (
     client: params.client,
     context: params.context,
     delay: params.delay,
-    repository: data.repository,
     selfID: params.selfID,
   });
 };
