@@ -34,6 +34,7 @@ const getStatusState = async (
     pr: params.context.payload.pull_request?.number ?? 0,
     repo: params.context.repo.repo,
   });
+  core.debug(JSON.stringify(data, null, 2));
   const isAllCompleted =
     data.repository?.pullRequest?.commits.edges?.[0]?.node?.commit.statusCheckRollup?.contexts.nodes?.every(
       (node) => {
