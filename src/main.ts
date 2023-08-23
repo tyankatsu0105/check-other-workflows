@@ -24,6 +24,8 @@ const getStatusState = async (
     selfID: number;
   }>
 ): Promise<StatusState> => {
+  await wait(params.delay);
+
   const data = await params.client.query<
     GetLatestCommitChecksQueryVariables,
     GetLatestCommitChecksQuery
@@ -48,8 +50,6 @@ const getStatusState = async (
       data.repository?.pullRequest?.commits.edges?.[0]?.node?.commit
         .statusCheckRollup?.state ?? StatusState.Success
     );
-
-  await wait(params.delay);
   core.info("Waiting for all checks to complete...");
 
   return getStatusState({
