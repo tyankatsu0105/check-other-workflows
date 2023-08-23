@@ -38,9 +38,10 @@ const getStatusState = async (
   const isAllCompleted =
     data.repository?.pullRequest?.commits.edges?.[0]?.node?.commit.statusCheckRollup?.contexts.nodes?.every(
       (node) => {
-        if (node?.__typename !== "CheckRun") return true;
+        if (node?.__typename !== "CheckRun") return;
+        if (node.conclusion === null) return;
+
         if (node.permalink.includes(params.selfID.toString())) return true;
-        if (node.conclusion === null) return false;
 
         return node.status === CheckStatusState.Completed;
       }
@@ -53,7 +54,7 @@ const getStatusState = async (
     );
   core.info("Waiting for all checks to complete...");
 
-  return getStatusState({
+  return await getStatusState({
     client: params.client,
     context: params.context,
     delay: params.delay,
