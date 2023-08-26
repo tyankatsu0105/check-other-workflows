@@ -77,6 +77,7 @@ const getStatusState = async (
     selfID: number;
   }>
 ): Promise<StatusState> => {
+  core.info(JSON.stringify(params, null, 2));
   const { repository } = await params.client.query<
     GetLatestCommitChecksQueryVariables,
     GetLatestCommitChecksQuery
@@ -91,7 +92,8 @@ const getStatusState = async (
       (node) => {
         if (
           node?.__typename === "CheckRun" &&
-          node.permalink.includes(params.selfID.toString())
+          node.permalink.includes(params.selfID.toString()) &&
+          node.name === params.context.eventName
         )
           return false;
 
