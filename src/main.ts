@@ -19,6 +19,16 @@ const assertData = <ReturnType = unknown>(
   callback?: (data: never) => ReturnType
 ) => (callback ? callback(data) : data);
 
+const customContextStatus = {
+  FAILURE: "FAILURE",
+  IGNORE: "IGNORE",
+  NOT_COMPLETED: "NOT_COMPLETED",
+  SUCCESS: "SUCCESS",
+} as const;
+
+type CustomContextStatusValues =
+  (typeof customContextStatus)[keyof typeof customContextStatus];
+
 const statusOnStatusCheckRollupContext = (
   context: NonNullable<
     NonNullable<
@@ -37,22 +47,22 @@ const statusOnStatusCheckRollupContext = (
       >["contexts"]
     >["nodes"]
   >[number]
-) => {
+): CustomContextStatusValues => {
   if (context?.__typename !== "CheckRun")
     throw new Error("context is not CheckRun");
   // conclusion get some value when status is "COMPLETED"
   if (context.status !== CheckStatusState.Completed)
-    return "NOT_COMPLETED" as const;
+    return customContextStatus.NOT_COMPLETED;
   // conclusion is null when status is "QUEUED" or "IN_PROGRESS"
-  if (!context.conclusion) return "NOT_COMPLETED" as const;
+  if (!context.conclusion) return customContextStatus.NOT_COMPLETED;
 
   switch (context.conclusion) {
     case CheckConclusionState.Success:
-      return "SUCCESS" as const;
+      return customContextStatus.SUCCESS;
 
     case CheckConclusionState.Neutral:
     case CheckConclusionState.Skipped:
-      return "IGNORE" as const;
+      return customContextStatus.IGNORE;
 
     case CheckConclusionState.ActionRequired:
     case CheckConclusionState.Cancelled:
@@ -60,10 +70,10 @@ const statusOnStatusCheckRollupContext = (
     case CheckConclusionState.Stale:
     case CheckConclusionState.StartupFailure:
     case CheckConclusionState.TimedOut:
-      return "FAILURE" as const;
+      return customContextStatus.FAILURE;
 
     default:
-      return assertData(context.conclusion, () => "FAILURE" as const);
+      return assertData(context.conclusion, () => customContextStatus.FAILURE);
   }
 };
 
@@ -75,7 +85,7 @@ const getStatusState = async (
     context: Context;
     delay: number;
   }>
-): Promise<StatusState> => {
+): Promise<CustomContextStatusValues> => {
   const { repository } = await params.client.query<
     GetLatestCommitChecksQueryVariables,
     GetLatestCommitChecksQuery
@@ -107,20 +117,25 @@ const getStatusState = async (
     return status === "NOT_COMPLETED";
   });
 
-  if (!needRefetch) {
-    core.debug(
-      JSON.stringify(
-        repository?.pullRequest?.commits.edges?.[0]?.node?.commit
-          .statusCheckRollup,
-        null,
-        2
-      )
-    );
-    return (
-      repository?.pullRequest?.commits.edges?.[0]?.node?.commit
-        .statusCheckRollup?.state ?? StatusState.Success
-    );
+  if (needRefetch) {
+    await wait(params.delay);
+    core.info("Waiting for all checks to complete...");
+
+    return await getStatusState({
+      client: params.client,
+      context: params.context,
+      delay: params.delay,
+    });
   }
+
+  const isAllSuccess = contextsWithoutSelf?.every((context) => {
+    const status = statusOnStatusCheckRollupContext(context);
+
+    return status === customContextStatus.SUCCESS;
+  });
+
+  if (isAllSuccess) return customContextStatus.SUCCESS;
+  return customContextStatus.FAILURE;
 
   // contextsWithoutSelf?.forEach((context) => {
   //   const status = statusOnStatusCheckRollupContext(context);
@@ -152,15 +167,6 @@ const getStatusState = async (
   //     repository?.pullRequest?.commits.edges?.[0]?.node?.commit
   //       .statusCheckRollup?.state ?? StatusState.Success
   //   );
-
-  await wait(params.delay);
-  core.info("Waiting for all checks to complete...");
-
-  return await getStatusState({
-    client: params.client,
-    context: params.context,
-    delay: params.delay,
-  });
 };
 
 const run = async () => {
