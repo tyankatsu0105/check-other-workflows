@@ -88,9 +88,15 @@ const getStatusState = async (
 
   const contextsWithoutSelf =
     repository?.pullRequest?.commits.edges?.[0]?.node?.commit.statusCheckRollup?.contexts.nodes?.filter(
-      (node) =>
-        node?.__typename === "CheckRun" &&
-        node.permalink.includes(params.selfID.toString())
+      (node) => {
+        if (
+          node?.__typename === "CheckRun" &&
+          node.permalink.includes(params.selfID.toString())
+        )
+          return false;
+
+        return true;
+      }
     );
 
   core.info(JSON.stringify(contextsWithoutSelf, null, 2));
