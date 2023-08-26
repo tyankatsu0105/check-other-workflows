@@ -10,7 +10,6 @@ import {
   GetLatestCommitChecksQuery,
   GetLatestCommitChecksQueryVariables,
   octokitGraphQLClient,
-  StatusState,
 } from "./graphql";
 import { getInput, Inputs } from "./input";
 
@@ -79,6 +78,11 @@ const statusOnStatusCheckRollupContext = (
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+/**
+ * NOTE: statusCheckRollup.stateは初回のみ判定
+ * approvedやlabeledなどのイベントではinprogressなどにならず、前回のstateのままになる
+ * そのためstatusCheckRollup.stateを使わずに、リアルタイムで状態が変わるcontextのconclusionとstatusを使う
+ */
 const getStatusState = async (
   params: Readonly<{
     client: ReturnType<typeof octokitGraphQLClient>["client"];
@@ -136,37 +140,6 @@ const getStatusState = async (
 
   if (isAllSuccess) return customContextStatus.SUCCESS;
   return customContextStatus.FAILURE;
-
-  // contextsWithoutSelf?.forEach((context) => {
-  //   const status = statusOnStatusCheckRollupContext(context);
-
-  //   switch (status) {
-  //     case 'IGNORE':
-
-  //       break;
-
-  //     default:
-  //       assertData(status, () => {});
-  //   }
-  // });
-
-  // const isAllCompleted =
-  //   repository?.pullRequest?.commits.edges?.[0]?.node?.commit.statusCheckRollup?.contexts.nodes?.every(
-  //     (node) => {
-  //       if (node?.__typename !== "CheckRun") return;
-  //       if (node.conclusion === null) return;
-
-  //       if (node.permalink.includes(params.selfID.toString())) return true;
-
-  //       return node.status === CheckStatusState.Completed;
-  //     }
-  //   );
-
-  // if (isAllCompleted)
-  //   return (
-  //     repository?.pullRequest?.commits.edges?.[0]?.node?.commit
-  //       .statusCheckRollup?.state ?? StatusState.Success
-  //   );
 };
 
 const run = async () => {
