@@ -74,7 +74,6 @@ const getStatusState = async (
     client: ReturnType<typeof octokitGraphQLClient>["client"];
     context: Context;
     delay: number;
-    selfID: number;
   }>
 ): Promise<StatusState> => {
   core.info(JSON.stringify(params, null, 2));
@@ -90,10 +89,11 @@ const getStatusState = async (
   const contextsWithoutSelf =
     repository?.pullRequest?.commits.edges?.[0]?.node?.commit.statusCheckRollup?.contexts.nodes?.filter(
       (node) => {
+        const selfID = params.context.runId;
+
         if (
           node?.__typename === "CheckRun" &&
-          node.permalink.includes(params.selfID.toString()) &&
-          node.name === params.context.eventName
+          node.permalink.includes(selfID.toString())
         )
           return false;
 
@@ -155,7 +155,6 @@ const getStatusState = async (
     client: params.client,
     context: params.context,
     delay: params.delay,
-    selfID: params.selfID,
   });
 };
 
@@ -166,7 +165,6 @@ const run = async () => {
     };
 
     const context = github.context;
-    const self = context.runId;
 
     const { client } = octokitGraphQLClient({ token: inputs.token });
 
@@ -174,7 +172,6 @@ const run = async () => {
       client,
       context,
       delay: 5000,
-      selfID: self,
     });
 
     core.debug(JSON.stringify(inputs, null, 2));
