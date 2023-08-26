@@ -76,7 +76,6 @@ const getStatusState = async (
     delay: number;
   }>
 ): Promise<StatusState> => {
-  core.info(JSON.stringify(params, null, 2));
   const { repository } = await params.client.query<
     GetLatestCommitChecksQueryVariables,
     GetLatestCommitChecksQuery
@@ -93,7 +92,8 @@ const getStatusState = async (
 
         if (
           node?.__typename === "CheckRun" &&
-          node.permalink.includes(selfID.toString())
+          node.permalink.includes(selfID.toString()) &&
+          params.context.job === node.name
         )
           return false;
 
@@ -101,12 +101,8 @@ const getStatusState = async (
       }
     );
 
-  core.info(JSON.stringify(contextsWithoutSelf, null, 2));
-
   const needRefetch = contextsWithoutSelf?.some((context) => {
     const status = statusOnStatusCheckRollupContext(context);
-
-    core.info(status);
 
     return status === "NOT_COMPLETED";
   });
@@ -174,7 +170,6 @@ const run = async () => {
       delay: 5000,
     });
 
-    core.debug(JSON.stringify(inputs, null, 2));
     core.debug(JSON.stringify(state, null, 2));
 
     // core.setOutput("time", new Date().toTimeString());
