@@ -96,6 +96,8 @@ const getStatusState = async (
   const needRefetch = contextsWithoutSelf?.some((context) => {
     const status = statusOnStatusCheckRollupContext(context);
 
+    core.info(status);
+
     return status === "NOT_COMPLETED";
   });
 
