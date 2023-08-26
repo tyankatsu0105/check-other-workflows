@@ -107,11 +107,20 @@ const getStatusState = async (
     return status === "NOT_COMPLETED";
   });
 
-  if (!needRefetch)
+  if (!needRefetch) {
+    core.debug(
+      JSON.stringify(
+        repository?.pullRequest?.commits.edges?.[0]?.node?.commit
+          .statusCheckRollup,
+        null,
+        2
+      )
+    );
     return (
       repository?.pullRequest?.commits.edges?.[0]?.node?.commit
         .statusCheckRollup?.state ?? StatusState.Success
     );
+  }
 
   // contextsWithoutSelf?.forEach((context) => {
   //   const status = statusOnStatusCheckRollupContext(context);
