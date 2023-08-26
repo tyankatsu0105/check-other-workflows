@@ -93,6 +93,8 @@ const getStatusState = async (
         node.permalink.includes(params.selfID.toString())
     );
 
+  core.info(JSON.stringify(contextsWithoutSelf, null, 2));
+
   const needRefetch = contextsWithoutSelf?.some((context) => {
     const status = statusOnStatusCheckRollupContext(context);
 
