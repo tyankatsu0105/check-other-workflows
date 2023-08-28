@@ -25,7 +25,5 @@ jobs:
       - run: npm run build
 
       - uses: ./
-        env:
-          GH_TOKEN: ${{ github.token }}
         with:
-          milliseconds: 1000
+          token: ${{ github.token }}
