@@ -6,6 +6,9 @@ inputs:
   token:
     description: "GITHUB_TOKEN or a `repo` scoped Personal Access Token (PAT)"
     default: ${{ github.token }}
+  interval:
+    description: "The interval of checking other workflows"
+    default: "5000"
 
 outputs:
   status:
