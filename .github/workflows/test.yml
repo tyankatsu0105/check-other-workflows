@@ -27,4 +27,4 @@ jobs:
       - uses: ./
         with:
           token: ${{ github.token }}
-          interval: 100
+          interval: 10000
