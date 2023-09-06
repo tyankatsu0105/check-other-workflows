@@ -29,12 +29,21 @@
     "format:eslint:fix": "eslint src/**/*.ts --fix",
     "format": "run-s format:prettier format:eslint",
     "format:fix": "run-s format:prettier:fix format:eslint:fix",
-    "test": "npm run build && vitest"
+    "test": "npm run build && vitest --run",
+    "test:watch": "npm run build && vitest",
+    "codegen": "graphql-codegen --config codegen.ts"
   },
   "dependencies": {
-    "@actions/core": "^1.10.0"
+    "@actions/core": "^1.10.0",
+    "@actions/exec": "^1.1.1",
+    "@actions/github": "^5.1.1"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "5.0.0",
+    "@graphql-codegen/typed-document-node": "5.0.1",
+    "@graphql-codegen/typescript": "4.0.1",
+    "@graphql-codegen/typescript-msw": "1.1.6",
+    "@graphql-codegen/typescript-operations": "4.0.1",
     "@types/node": "20.5.0",
     "@typescript-eslint/eslint-plugin": "6.4.0",
     "@typescript-eslint/parser": "6.4.0",
@@ -45,7 +54,10 @@
     "eslint-plugin-simple-import-sort": "10.0.0",
     "eslint-plugin-sort-destructure-keys": "1.5.0",
     "eslint-plugin-sort-keys-fix": "1.1.2",
+    "graphql": "16.8.0",
+    "graphql-config": "5.0.2",
     "js-yaml": "4.1.0",
+    "msw": "1.2.5",
     "npm-run-all": "4.1.5",
     "prettier": "3.0.2",
     "typescript": "5.1.6",

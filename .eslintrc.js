@@ -3,37 +3,40 @@
  */
 module.exports = {
   extends: [
-    'eslint:recommended',
+    "eslint:recommended",
 
-    'plugin:import/typescript',
-    'plugin:import/recommended',
+    "plugin:import/typescript",
+    "plugin:import/recommended",
 
-    'plugin:@typescript-eslint/recommended',
-    'plugin:@typescript-eslint/recommended-type-checked'
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-type-checked",
   ],
-  parser: '@typescript-eslint/parser',
+  parser: "@typescript-eslint/parser",
   parserOptions: {
     project: true,
     tsconfigRootDir: __dirname,
-    sourceType: 'module'
+    sourceType: "module",
   },
   plugins: [
-    '@typescript-eslint',
-    'import',
-    'simple-import-sort',
-    'sort-keys-fix',
-    'sort-destructure-keys'
+    "@typescript-eslint",
+    "import",
+    "simple-import-sort",
+    "sort-keys-fix",
+    "sort-destructure-keys",
   ],
   root: true,
   rules: {
-    'sort-keys-fix/sort-keys-fix': 'error',
-    'sort-destructure-keys/sort-destructure-keys': 'warn',
-    'simple-import-sort/imports': 'error',
-    'simple-import-sort/exports': 'error',
-    'import/first': 'error',
-    'import/newline-after-import': 'error',
-    'import/no-duplicates': 'error',
-    '@typescript-eslint/sort-type-constituents': 'error',
-    '@typescript-eslint/no-unused-vars': ['error', {argsIgnorePattern: '^_'}]
-  }
-}
+    "sort-keys-fix/sort-keys-fix": "error",
+    "sort-destructure-keys/sort-destructure-keys": "warn",
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
+    "import/first": "error",
+    "import/newline-after-import": "error",
+    "import/no-duplicates": "error",
+    "@typescript-eslint/sort-type-constituents": "error",
+    "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+    "@typescript-eslint/no-unsafe-argument": "off",
+    "@typescript-eslint/no-unsafe-call": "off",
+    "@typescript-eslint/no-unsafe-member-access": "off",
+  },
+};

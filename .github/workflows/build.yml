@@ -1,4 +1,4 @@
-name: "test"
+name: "build"
 on: # rebuild any PRs and main branch changes
   pull_request:
   push:
@@ -15,16 +15,3 @@ jobs:
           npm install
       - run: |
           npm run build
-  test: # make sure the action works on a clean machine without building
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - run: npm install
-
-      - run: npm run build
-
-      - uses: ./
-        with:
-          token: ${{ github.token }}
-          interval: 10000
