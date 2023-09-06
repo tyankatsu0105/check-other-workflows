@@ -77,7 +77,19 @@ const statusOnStatusCheckRollupContext = (
 export const getStatusState = async (
   params: Readonly<{
     client: ReturnType<typeof octokitGraphQLClient>["client"];
-    context: Context;
+    context: {
+      repo: {
+        owner: Context["repo"]["owner"];
+        repo: Context["repo"]["repo"];
+      };
+      payload: {
+        pull_request?: {
+          number: NonNullable<Context["payload"]["pull_request"]>["number"];
+        };
+      };
+      runId: Context["runId"];
+      job: Context["job"];
+    };
     delay: number;
   }>
 ): Promise<CustomContextStatusValues> => {
