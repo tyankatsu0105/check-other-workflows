@@ -18,6 +18,8 @@ const config: CodegenConfig = {
     },
     "src/graphql/mocks/generated.ts": {
       config: {
+        immutableTypes: true,
+        noExport: true,
         scalars: {
           URI: "string",
         },
