@@ -15,13 +15,8 @@ import {
   CheckStatusState,
   octokitGraphQLClient,
 } from "./graphql";
-import {
-  mockGetLatestCommitChecksQuery,
-  StatusState,
-} from "./graphql/mocks/generated";
+import { mockGetLatestCommitChecksQuery } from "./graphql/mocks/generated";
 import * as Feature from "./status";
-
-const infoMock = vi.spyOn(core, "info");
 
 const server = setupServer();
 
@@ -76,6 +71,11 @@ describe("status", () => {
           },
           delay: 1000,
         };
+        const permalink = getPermalink({
+          owner: params.context.repo.owner,
+          repo: params.context.repo.repo,
+          runId: params.context.runId,
+        });
         server.use(
           mockGetLatestCommitChecksQuery((_, res, ctx) => {
             return res(
@@ -94,16 +94,11 @@ describe("status", () => {
                                       __typename: "CheckRun",
                                       conclusion: CheckConclusionState.Success,
                                       name: "test",
-                                      permalink: getPermalink({
-                                        owner: params.context.repo.owner,
-                                        repo: params.context.repo.repo,
-                                        runId: params.context.runId,
-                                      }),
+                                      permalink,
                                       status: CheckStatusState.Completed,
                                     },
                                   ],
                                 },
-                                state: StatusState.Success,
                               },
                             },
                           },
@@ -123,6 +118,7 @@ describe("status", () => {
       });
 
       it("when all statusCheckRollup's contexts's status is not completed, then refetch until completed.", async () => {
+        const infoMock = vi.spyOn(core, "info");
         const { client } = mockedClient();
         const params: Parameters<typeof Feature.getStatusState>[0] = {
           client,
@@ -141,6 +137,11 @@ describe("status", () => {
           },
           delay: 1000,
         };
+        const permalink = getPermalink({
+          owner: params.context.repo.owner,
+          repo: params.context.repo.repo,
+          runId: params.context.runId,
+        });
         server.use(
           mockGetLatestCommitChecksQuery((_, res, ctx) => {
             return res(
@@ -159,16 +160,11 @@ describe("status", () => {
                                       __typename: "CheckRun",
                                       conclusion: null,
                                       name: "test",
-                                      permalink: getPermalink({
-                                        owner: params.context.repo.owner,
-                                        repo: params.context.repo.repo,
-                                        runId: params.context.runId,
-                                      }),
+                                      permalink,
                                       status: CheckStatusState.InProgress,
                                     },
                                   ],
                                 },
-                                state: StatusState.Success,
                               },
                             },
                           },
@@ -211,7 +207,6 @@ describe("status", () => {
                                       },
                                     ],
                                   },
-                                  state: StatusState.Success,
                                 },
                               },
                             },
@@ -224,10 +219,124 @@ describe("status", () => {
               );
             })
           );
-        }, 1500);
+        }, 500);
 
         const result = await Feature.getStatusState(params);
 
+        expect(infoMock).toBeCalledTimes(1);
+        expect(infoMock).toHaveBeenCalledWith(
+          "Waiting for all checks to complete..."
+        );
+        expect(result).toBe("SUCCESS");
+      });
+
+      it("when all statusCheckRollup's contexts's status is not completed, then refetch until completed.", async () => {
+        const infoMock = vi.spyOn(core, "info");
+        const { client } = mockedClient();
+        const params: Parameters<typeof Feature.getStatusState>[0] = {
+          client,
+          context: {
+            job: "job",
+            payload: {
+              pull_request: {
+                number: 0,
+              },
+            },
+            repo: {
+              owner: "owner",
+              repo: "repo",
+            },
+            runId: 123456789,
+          },
+          delay: 1000,
+        };
+        const permalink = getPermalink({
+          owner: params.context.repo.owner,
+          repo: params.context.repo.repo,
+          runId: params.context.runId,
+        });
+        server.use(
+          mockGetLatestCommitChecksQuery((_, res, ctx) => {
+            return res(
+              ctx.data({
+                repository: {
+                  pullRequest: {
+                    commits: {
+                      edges: [
+                        {
+                          node: {
+                            commit: {
+                              statusCheckRollup: {
+                                contexts: {
+                                  nodes: [
+                                    {
+                                      __typename: "CheckRun",
+                                      conclusion: null,
+                                      name: "test",
+                                      permalink,
+                                      status: CheckStatusState.InProgress,
+                                    },
+                                  ],
+                                },
+                              },
+                            },
+                          },
+                        },
+                      ],
+                    },
+                  },
+                },
+              })
+            );
+          })
+        );
+
+        setTimeout(() => {
+          server.use(
+            mockGetLatestCommitChecksQuery((_, res, ctx) => {
+              return res(
+                ctx.data({
+                  repository: {
+                    pullRequest: {
+                      commits: {
+                        edges: [
+                          {
+                            node: {
+                              commit: {
+                                statusCheckRollup: {
+                                  contexts: {
+                                    nodes: [
+                                      {
+                                        __typename: "CheckRun",
+                                        conclusion:
+                                          CheckConclusionState.Success,
+                                        name: "test",
+                                        permalink: getPermalink({
+                                          owner: params.context.repo.owner,
+                                          repo: params.context.repo.repo,
+                                          runId: params.context.runId,
+                                        }),
+                                        status: CheckStatusState.Completed,
+                                      },
+                                    ],
+                                  },
+                                },
+                              },
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  },
+                })
+              );
+            })
+          );
+        }, 500);
+
+        const result = await Feature.getStatusState(params);
+
+        expect(infoMock).toBeCalledTimes(1);
         expect(infoMock).toHaveBeenCalledWith(
           "Waiting for all checks to complete..."
         );

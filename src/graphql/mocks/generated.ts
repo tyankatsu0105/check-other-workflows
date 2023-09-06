@@ -28861,7 +28861,7 @@ export type GetLatestCommitChecksQueryVariables = Exact<{
 }>;
 
 
-export type GetLatestCommitChecksQuery = { repository?: { pullRequest?: { commits: { edges?: Array<{ node?: { commit: { statusCheckRollup?: { state: StatusState, contexts: { nodes?: Array<{ __typename: 'CheckRun', conclusion?: CheckConclusionState | null, status: CheckStatusState, name: string, permalink: string } | { __typename: 'StatusContext' } | null> | null } } | null } } | null } | null> | null } } | null } | null };
+export type GetLatestCommitChecksQuery = { repository?: { pullRequest?: { commits: { edges?: Array<{ node?: { commit: { statusCheckRollup?: { contexts: { nodes?: Array<{ __typename: 'CheckRun', conclusion?: CheckConclusionState | null, status: CheckStatusState, name: string, permalink: string } | { __typename: 'StatusContext' } | null> | null } } | null } } | null } | null> | null } } | null } | null };
 
 
 /**
