@@ -1,0 +1,20 @@
+name: Action test
+
+on: push
+
+jobs:
+  action-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - run: npm install
+
+      - run: npm run build
+
+      - uses: ./
+        with:
+          token: ${{ github.token }}
+          interval: 10000
