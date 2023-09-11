@@ -18,5 +18,5 @@ export type Inputs = Readonly<{
 
 export const getInput = <InputKey extends keyof Inputs>(
   name: InputKey,
-  options?: Parameters<typeof core.getInput>[1]
+  options?: Parameters<typeof core.getInput>[1],
 ): Inputs[InputKey] => core.getInput(name, options);

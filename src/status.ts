@@ -38,7 +38,7 @@ const statusOnStatusCheckRollupContext = (
         >["commit"]["statusCheckRollup"]
       >["contexts"]
     >["nodes"]
-  >[number]
+  >[number],
 ): CustomContextStatusValues => {
   if (context?.__typename !== "CheckRun")
     throw new Error("context is not CheckRun");
@@ -91,7 +91,7 @@ export const getStatusState = async (
       job: Context["job"];
     };
     delay: number;
-  }>
+  }>,
 ): Promise<CustomContextStatusValues> => {
   const { repository } = await params.client.query<
     GetLatestCommitChecksQueryVariables,
@@ -115,7 +115,7 @@ export const getStatusState = async (
           return false;
 
         return true;
-      }
+      },
     );
 
   const needRefetch = contextsWithoutSelf?.some((context) => {
