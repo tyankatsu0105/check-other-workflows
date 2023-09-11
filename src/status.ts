@@ -70,9 +70,9 @@ const statusOnStatusCheckRollupContext = (
 };
 
 /**
- * NOTE: statusCheckRollup.stateは初回のみ判定
- * approvedやlabeledなどのイベントではinprogressなどにならず、前回のstateのままになる
- * そのためstatusCheckRollup.stateを使わずに、リアルタイムで状態が変わるcontextのconclusionとstatusを使う
+ * NOTE: `statusCheckRollup.state` is only judged for the first time.
+ * It does not become PENDING, in events such as approved and labeled.
+ * So, we choose to use the conclusion and status of the context because it changes in real time.
  */
 export const getStatusState = async (
   params: Readonly<{
