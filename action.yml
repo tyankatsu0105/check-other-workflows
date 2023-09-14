@@ -1,11 +1,23 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: "Check Other Workflows"
+description: "Check other workflows and output the status"
+author: "tyankastu0105"
+
 inputs:
-  milliseconds: # change this
-    required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+  token:
+    description: "GITHUB_TOKEN or a `repo` scoped Personal Access Token (PAT)"
+    default: ${{ github.token }}
+  interval:
+    description: "The interval of checking other workflows"
+    default: "5000"
+
+outputs:
+  status:
+    description: "The status of result after checking other workflows"
+
 runs:
-  using: 'node16'
-  main: 'dist/index.js'
+  using: "node16"
+  main: "dist/index.js"
+
+branding:
+  icon: "check-square"
+  color: "green"

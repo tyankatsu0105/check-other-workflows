@@ -1,21 +1,26 @@
 import * as core from "@actions/core";
+import * as github from "@actions/github";
 
-import { getInput } from "./input";
-import { wait } from "./wait";
+import { feature } from "./feature";
+import { getInput, Inputs } from "./input";
 
 const run = async () => {
   try {
-    const ms = getInput("milliseconds");
-    core.debug(`Waiting ${ms} milliseconds ...`); // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
+    const inputs: Inputs = {
+      interval: getInput("interval") || "5000",
+      token: getInput("token", { required: true }),
+    };
 
-    core.debug(new Date().toTimeString());
-    await wait(parseInt(ms, 10));
-    core.debug(new Date().toTimeString());
+    const context = github.context;
 
-    core.setOutput("time", new Date().toTimeString());
+    await feature({
+      context,
+      inputs,
+    });
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message);
   }
 };
 
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 run();

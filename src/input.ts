@@ -1,14 +1,22 @@
 import * as core from "@actions/core";
 
-type Input = Readonly<{
+/**
+ * Must sync action.yml
+ */
+export type Inputs = Readonly<{
   /**
-   * The number of milliseconds to wait.
-   * @example 1000
+   * GitHub Access Token
    */
-  milliseconds: string;
+  token: string;
+
+  /**
+   * Interval to check status
+   * @default '5000'
+   */
+  interval: string;
 }>;
 
-export const getInput = <InputKey extends keyof Input>(
+export const getInput = <InputKey extends keyof Inputs>(
   name: InputKey,
   options?: Parameters<typeof core.getInput>[1],
-): Input[InputKey] => core.getInput(name, options);
+): Inputs[InputKey] => core.getInput(name, options);

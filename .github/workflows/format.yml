@@ -1,9 +1,9 @@
-name: Test
+name: Format
 
 on: push
 
 jobs:
-  test:
+  format:
     runs-on: ubuntu-latest
 
     steps:
@@ -27,4 +27,4 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
 
-      - run: npm run test
+      - run: npm run format
