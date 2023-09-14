@@ -58,16 +58,12 @@ describe("status", () => {
           client,
           context: {
             job: "job",
-            payload: {
-              pull_request: {
-                number: 0,
-              },
-            },
             repo: {
               owner: "owner",
               repo: "repo",
             },
             runId: 123456789,
+            sha: "sha",
           },
           delay: 1000,
         };
@@ -81,35 +77,26 @@ describe("status", () => {
             return res(
               ctx.data({
                 repository: {
-                  pullRequest: {
-                    commits: {
-                      edges: [
-                        {
-                          node: {
-                            commit: {
-                              statusCheckRollup: {
-                                contexts: {
-                                  nodes: [
-                                    {
-                                      __typename: "CheckRun",
-                                      conclusion: CheckConclusionState.Success,
-                                      name: "test",
-                                      permalink,
-                                      status: CheckStatusState.Completed,
-                                    },
-                                  ],
-                                },
-                              },
-                            },
+                  object: {
+                    __typename: "Commit",
+                    statusCheckRollup: {
+                      contexts: {
+                        nodes: [
+                          {
+                            __typename: "CheckRun",
+                            conclusion: CheckConclusionState.Success,
+                            name: "test",
+                            permalink,
+                            status: CheckStatusState.Completed,
                           },
-                        },
-                      ],
+                        ],
+                      },
                     },
                   },
                 },
-              }),
+              })
             );
-          }),
+          })
         );
 
         const result = await Feature.getStatusState(params);
@@ -124,16 +111,12 @@ describe("status", () => {
           client,
           context: {
             job: "job",
-            payload: {
-              pull_request: {
-                number: 0,
-              },
-            },
             repo: {
               owner: "owner",
               repo: "repo",
             },
             runId: 123456789,
+            sha: "sha",
           },
           delay: 1000,
         };
@@ -147,35 +130,26 @@ describe("status", () => {
             return res(
               ctx.data({
                 repository: {
-                  pullRequest: {
-                    commits: {
-                      edges: [
-                        {
-                          node: {
-                            commit: {
-                              statusCheckRollup: {
-                                contexts: {
-                                  nodes: [
-                                    {
-                                      __typename: "CheckRun",
-                                      conclusion: null,
-                                      name: "test",
-                                      permalink,
-                                      status: CheckStatusState.InProgress,
-                                    },
-                                  ],
-                                },
-                              },
-                            },
+                  object: {
+                    __typename: "Commit",
+                    statusCheckRollup: {
+                      contexts: {
+                        nodes: [
+                          {
+                            __typename: "CheckRun",
+                            conclusion: null,
+                            name: "test",
+                            permalink,
+                            status: CheckStatusState.InProgress,
                           },
-                        },
-                      ],
+                        ],
+                      },
                     },
                   },
                 },
-              }),
+              })
             );
-          }),
+          })
         );
 
         setTimeout(() => {
@@ -184,40 +158,30 @@ describe("status", () => {
               return res(
                 ctx.data({
                   repository: {
-                    pullRequest: {
-                      commits: {
-                        edges: [
-                          {
-                            node: {
-                              commit: {
-                                statusCheckRollup: {
-                                  contexts: {
-                                    nodes: [
-                                      {
-                                        __typename: "CheckRun",
-                                        conclusion:
-                                          CheckConclusionState.Success,
-                                        name: "test",
-                                        permalink: getPermalink({
-                                          owner: params.context.repo.owner,
-                                          repo: params.context.repo.repo,
-                                          runId: params.context.runId,
-                                        }),
-                                        status: CheckStatusState.Completed,
-                                      },
-                                    ],
-                                  },
-                                },
-                              },
+                    object: {
+                      __typename: "Commit",
+                      statusCheckRollup: {
+                        contexts: {
+                          nodes: [
+                            {
+                              __typename: "CheckRun",
+                              conclusion: CheckConclusionState.Success,
+                              name: "test",
+                              permalink: getPermalink({
+                                owner: params.context.repo.owner,
+                                repo: params.context.repo.repo,
+                                runId: params.context.runId,
+                              }),
+                              status: CheckStatusState.Completed,
                             },
-                          },
-                        ],
+                          ],
+                        },
                       },
                     },
                   },
-                }),
+                })
               );
-            }),
+            })
           );
         }, 500);
 
@@ -225,7 +189,7 @@ describe("status", () => {
 
         expect(infoMock).toBeCalledTimes(1);
         expect(infoMock).toHaveBeenCalledWith(
-          "Waiting for all checks to complete...",
+          "Waiting for all checks to complete..."
         );
         expect(result).toBe("SUCCESS");
       });
@@ -237,16 +201,12 @@ describe("status", () => {
           client,
           context: {
             job: "job",
-            payload: {
-              pull_request: {
-                number: 0,
-              },
-            },
             repo: {
               owner: "owner",
               repo: "repo",
             },
             runId: 123456789,
+            sha: "sha",
           },
           delay: 1000,
         };
@@ -260,35 +220,26 @@ describe("status", () => {
             return res(
               ctx.data({
                 repository: {
-                  pullRequest: {
-                    commits: {
-                      edges: [
-                        {
-                          node: {
-                            commit: {
-                              statusCheckRollup: {
-                                contexts: {
-                                  nodes: [
-                                    {
-                                      __typename: "CheckRun",
-                                      conclusion: null,
-                                      name: "test",
-                                      permalink,
-                                      status: CheckStatusState.InProgress,
-                                    },
-                                  ],
-                                },
-                              },
-                            },
+                  object: {
+                    __typename: "Commit",
+                    statusCheckRollup: {
+                      contexts: {
+                        nodes: [
+                          {
+                            __typename: "CheckRun",
+                            conclusion: null,
+                            name: "test",
+                            permalink,
+                            status: CheckStatusState.InProgress,
                           },
-                        },
-                      ],
+                        ],
+                      },
                     },
                   },
                 },
-              }),
+              })
             );
-          }),
+          })
         );
 
         setTimeout(() => {
@@ -297,40 +248,30 @@ describe("status", () => {
               return res(
                 ctx.data({
                   repository: {
-                    pullRequest: {
-                      commits: {
-                        edges: [
-                          {
-                            node: {
-                              commit: {
-                                statusCheckRollup: {
-                                  contexts: {
-                                    nodes: [
-                                      {
-                                        __typename: "CheckRun",
-                                        conclusion:
-                                          CheckConclusionState.Success,
-                                        name: "test",
-                                        permalink: getPermalink({
-                                          owner: params.context.repo.owner,
-                                          repo: params.context.repo.repo,
-                                          runId: params.context.runId,
-                                        }),
-                                        status: CheckStatusState.Completed,
-                                      },
-                                    ],
-                                  },
-                                },
-                              },
+                    object: {
+                      __typename: "Commit",
+                      statusCheckRollup: {
+                        contexts: {
+                          nodes: [
+                            {
+                              __typename: "CheckRun",
+                              conclusion: CheckConclusionState.Success,
+                              name: "test",
+                              permalink: getPermalink({
+                                owner: params.context.repo.owner,
+                                repo: params.context.repo.repo,
+                                runId: params.context.runId,
+                              }),
+                              status: CheckStatusState.Completed,
                             },
-                          },
-                        ],
+                          ],
+                        },
                       },
                     },
                   },
-                }),
+                })
               );
-            }),
+            })
           );
         }, 500);
 
@@ -338,7 +279,7 @@ describe("status", () => {
 
         expect(infoMock).toBeCalledTimes(1);
         expect(infoMock).toHaveBeenCalledWith(
-          "Waiting for all checks to complete...",
+          "Waiting for all checks to complete..."
         );
         expect(result).toBe("SUCCESS");
       });

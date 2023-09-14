@@ -21,24 +21,16 @@ const customContextStatus = {
 type CustomContextStatusValues =
   (typeof customContextStatus)[keyof typeof customContextStatus];
 
+type Commit = Extract<
+  NonNullable<GetLatestCommitChecksQuery["repository"]>["object"],
+  { __typename: "Commit" }
+>;
+type StatusCheckRollupContext = NonNullable<
+  NonNullable<Commit["statusCheckRollup"]>["contexts"]["nodes"]
+>[number];
+
 const statusOnStatusCheckRollupContext = (
-  context: NonNullable<
-    NonNullable<
-      NonNullable<
-        NonNullable<
-          NonNullable<
-            NonNullable<
-              NonNullable<
-                NonNullable<
-                  GetLatestCommitChecksQuery["repository"]
-                >["pullRequest"]
-              >["commits"]["edges"]
-            >[number]
-          >["node"]
-        >["commit"]["statusCheckRollup"]
-      >["contexts"]
-    >["nodes"]
-  >[number],
+  context: StatusCheckRollupContext
 ): CustomContextStatusValues => {
   if (context?.__typename !== "CheckRun")
     throw new Error("context is not CheckRun");
@@ -82,41 +74,37 @@ export const getStatusState = async (
         owner: Context["repo"]["owner"];
         repo: Context["repo"]["repo"];
       };
-      payload: {
-        pull_request?: {
-          number: NonNullable<Context["payload"]["pull_request"]>["number"];
-        };
-      };
-      runId: Context["runId"];
       job: Context["job"];
+      sha: Context["sha"];
+      runId: Context["runId"];
     };
     delay: number;
-  }>,
+  }>
 ): Promise<CustomContextStatusValues> => {
   const { repository } = await params.client.query<
     GetLatestCommitChecksQueryVariables,
     GetLatestCommitChecksQuery
   >(GetLatestCommitChecksDocument.toString(), {
+    expression: params.context.sha,
     owner: params.context.repo.owner,
-    pr: params.context.payload.pull_request?.number ?? 0,
     repo: params.context.repo.repo,
   });
+  if (repository?.object?.__typename !== "Commit")
+    return customContextStatus.FAILURE;
 
   const contextsWithoutSelf =
-    repository?.pullRequest?.commits.edges?.[0]?.node?.commit.statusCheckRollup?.contexts.nodes?.filter(
-      (node) => {
-        const selfID = params.context.runId;
+    repository.object.statusCheckRollup?.contexts.nodes?.filter((node) => {
+      const selfID = params.context.runId;
 
-        if (
-          node?.__typename === "CheckRun" &&
-          node.permalink.includes(selfID.toString()) &&
-          params.context.job === node.name
-        )
-          return false;
+      if (
+        node?.__typename === "CheckRun" &&
+        node.permalink.includes(selfID.toString()) &&
+        params.context.job === node.name
+      )
+        return false;
 
-        return true;
-      },
-    );
+      return true;
+    });
 
   const needRefetch = contextsWithoutSelf?.some((context) => {
     const status = statusOnStatusCheckRollupContext(context);

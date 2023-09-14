@@ -1,22 +1,21 @@
-query GetLatestCommitChecks($owner: String!, $repo: String!, $pr: Int!) {
+query GetLatestCommitChecks(
+  $owner: String!
+  $repo: String!
+  $expression: String!
+) {
   repository(name: $repo, owner: $owner) {
-    pullRequest(number: $pr) {
-      commits(last: 1) {
-        edges {
-          node {
-            commit {
-              statusCheckRollup {
-                contexts(first: 100) {
-                  nodes {
-                    __typename
-                    ... on CheckRun {
-                      conclusion
-                      status
-                      name
-                      permalink
-                    }
-                  }
-                }
+    object(expression: $expression) {
+      __typename
+      ... on Commit {
+        statusCheckRollup {
+          contexts(first: 100) {
+            nodes {
+              __typename
+              ... on CheckRun {
+                conclusion
+                permalink
+                status
+                name
               }
             }
           }

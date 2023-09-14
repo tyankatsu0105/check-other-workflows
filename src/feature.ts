@@ -17,16 +17,12 @@ export const feature = async (params: Params) => {
     client,
     context: {
       job: params.context.job,
-      payload: {
-        pull_request: {
-          number: params.context.payload.pull_request?.number ?? 0,
-        },
-      },
       repo: {
         owner: params.context.repo.owner,
         repo: params.context.repo.repo,
       },
       runId: params.context.runId,
+      sha: params.context.sha,
     },
     delay,
   });

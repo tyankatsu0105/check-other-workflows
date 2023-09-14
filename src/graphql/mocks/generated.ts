@@ -28857,11 +28857,11 @@ enum WorkflowState {
 type GetLatestCommitChecksQueryVariables = Exact<{
   owner: Scalars['String']['input'];
   repo: Scalars['String']['input'];
-  pr: Scalars['Int']['input'];
+  expression: Scalars['String']['input'];
 }>;
 
 
-type GetLatestCommitChecksQuery = { readonly repository?: { readonly pullRequest?: { readonly commits: { readonly edges?: ReadonlyArray<{ readonly node?: { readonly commit: { readonly statusCheckRollup?: { readonly contexts: { readonly nodes?: ReadonlyArray<{ readonly __typename: 'CheckRun', readonly conclusion?: CheckConclusionState | null, readonly status: CheckStatusState, readonly name: string, readonly permalink: string } | { readonly __typename: 'StatusContext' } | null> | null } } | null } } | null } | null> | null } } | null } | null };
+type GetLatestCommitChecksQuery = { readonly repository?: { readonly object?: { readonly __typename: 'Blob' } | { readonly __typename: 'Commit', readonly statusCheckRollup?: { readonly contexts: { readonly nodes?: ReadonlyArray<{ readonly __typename: 'CheckRun', readonly conclusion?: CheckConclusionState | null, readonly permalink: string, readonly status: CheckStatusState, readonly name: string } | { readonly __typename: 'StatusContext' } | null> | null } } | null } | { readonly __typename: 'Tag' } | { readonly __typename: 'Tree' } | null } | null };
 
 
 /**
@@ -28869,7 +28869,7 @@ type GetLatestCommitChecksQuery = { readonly repository?: { readonly pullRequest
  * @see https://mswjs.io/docs/basics/response-resolver
  * @example
  * mockGetLatestCommitChecksQuery((req, res, ctx) => {
- *   const { owner, repo, pr } = req.variables;
+ *   const { owner, repo, expression } = req.variables;
  *   return res(
  *     ctx.data({ repository })
  *   )

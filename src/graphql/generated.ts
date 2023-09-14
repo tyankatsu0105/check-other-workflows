@@ -28857,11 +28857,11 @@ export enum WorkflowState {
 export type GetLatestCommitChecksQueryVariables = Exact<{
   owner: Scalars['String']['input'];
   repo: Scalars['String']['input'];
-  pr: Scalars['Int']['input'];
+  expression: Scalars['String']['input'];
 }>;
 
 
-export type GetLatestCommitChecksQuery = { repository?: { pullRequest?: { commits: { edges?: Array<{ node?: { commit: { statusCheckRollup?: { contexts: { nodes?: Array<{ __typename: 'CheckRun', conclusion?: CheckConclusionState | null, status: CheckStatusState, name: string, permalink: string } | { __typename: 'StatusContext' } | null> | null } } | null } } | null } | null> | null } } | null } | null };
+export type GetLatestCommitChecksQuery = { repository?: { object?: { __typename: 'Blob' } | { __typename: 'Commit', statusCheckRollup?: { contexts: { nodes?: Array<{ __typename: 'CheckRun', conclusion?: CheckConclusionState | null, permalink: string, status: CheckStatusState, name: string } | { __typename: 'StatusContext' } | null> | null } } | null } | { __typename: 'Tag' } | { __typename: 'Tree' } | null } | null };
 
 export class TypedDocumentString<TResult, TVariables>
   extends String
@@ -28879,25 +28879,20 @@ export class TypedDocumentString<TResult, TVariables>
 }
 
 export const GetLatestCommitChecksDocument = new TypedDocumentString(`
-    query GetLatestCommitChecks($owner: String!, $repo: String!, $pr: Int!) {
+    query GetLatestCommitChecks($owner: String!, $repo: String!, $expression: String!) {
   repository(name: $repo, owner: $owner) {
-    pullRequest(number: $pr) {
-      commits(last: 1) {
-        edges {
-          node {
-            commit {
-              statusCheckRollup {
-                contexts(first: 100) {
-                  nodes {
-                    __typename
-                    ... on CheckRun {
-                      conclusion
-                      status
-                      name
-                      permalink
-                    }
-                  }
-                }
+    object(expression: $expression) {
+      __typename
+      ... on Commit {
+        statusCheckRollup {
+          contexts(first: 100) {
+            nodes {
+              __typename
+              ... on CheckRun {
+                conclusion
+                permalink
+                status
+                name
               }
             }
           }
