@@ -94,9 +94,9 @@ describe("status", () => {
                     },
                   },
                 },
-              })
+              }),
             );
-          })
+          }),
         );
 
         const result = await Feature.getStatusState(params);
@@ -147,9 +147,9 @@ describe("status", () => {
                     },
                   },
                 },
-              })
+              }),
             );
-          })
+          }),
         );
 
         setTimeout(() => {
@@ -179,9 +179,9 @@ describe("status", () => {
                       },
                     },
                   },
-                })
+                }),
               );
-            })
+            }),
           );
         }, 500);
 
@@ -189,7 +189,7 @@ describe("status", () => {
 
         expect(infoMock).toBeCalledTimes(1);
         expect(infoMock).toHaveBeenCalledWith(
-          "Waiting for all checks to complete..."
+          "Waiting for all checks to complete...",
         );
         expect(result).toBe("SUCCESS");
       });
@@ -237,9 +237,9 @@ describe("status", () => {
                     },
                   },
                 },
-              })
+              }),
             );
-          })
+          }),
         );
 
         setTimeout(() => {
@@ -269,9 +269,9 @@ describe("status", () => {
                       },
                     },
                   },
-                })
+                }),
               );
-            })
+            }),
           );
         }, 500);
 
@@ -279,7 +279,7 @@ describe("status", () => {
 
         expect(infoMock).toBeCalledTimes(1);
         expect(infoMock).toHaveBeenCalledWith(
-          "Waiting for all checks to complete..."
+          "Waiting for all checks to complete...",
         );
         expect(result).toBe("SUCCESS");
       });

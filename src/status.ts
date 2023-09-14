@@ -30,7 +30,7 @@ type StatusCheckRollupContext = NonNullable<
 >[number];
 
 const statusOnStatusCheckRollupContext = (
-  context: StatusCheckRollupContext
+  context: StatusCheckRollupContext,
 ): CustomContextStatusValues => {
   if (context?.__typename !== "CheckRun")
     throw new Error("context is not CheckRun");
@@ -79,7 +79,7 @@ export const getStatusState = async (
       runId: Context["runId"];
     };
     delay: number;
-  }>
+  }>,
 ): Promise<CustomContextStatusValues> => {
   const { repository } = await params.client.query<
     GetLatestCommitChecksQueryVariables,
